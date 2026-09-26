@@ -1,0 +1,64 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Usuários ──────────────────────────────────────────────
+model User {
+  id             String          @id @default(cuid())
+  name           String
+  email          String          @unique
+  passwordHash   String
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  songRequests   SongRequest[]
+  prayerRequests PrayerRequest[]
+  boardMessages  BoardMessage[]
+
+  @@map("users")
+}
+
+// ─── Pedidos de Música ─────────────────────────────────────
+model SongRequest {
+  id        String   @id @default(cuid())
+  songName  String
+  artist    String?
+  status    String   @default("pending") // pending | approved | played
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@map("song_requests")
+}
+
+// ─── Pedidos de Oração ─────────────────────────────────────
+model PrayerRequest {
+  id        String   @id @default(cuid())
+  message   String
+  status    String   @default("pending") // pending | prayed
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@map("prayer_requests")
+}
+
+// ─── Mural de Recados ──────────────────────────────────────
+model BoardMessage {
+  id        String   @id @default(cuid())
+  message   String
+  approved  Boolean  @default(false)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@map("board_messages")
+}

@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { buildApp } from './app.js';
 
 const PORT = Number(process.env.PORT) || 3001;
@@ -9,7 +10,7 @@ const HOST = process.env.HOST || '0.0.0.0';
  * importada e testada sem iniciar o listener HTTP.
  */
 async function start(): Promise<void> {
-  const app = buildApp();
+  const app = buildApp({ logger: true });
 
   try {
     await app.listen({ port: PORT, host: HOST });
