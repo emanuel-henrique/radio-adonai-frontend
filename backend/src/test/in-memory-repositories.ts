@@ -11,23 +11,69 @@ export class InMemoryUserRepository implements IUserRepository {
   public users: User[] = [];
 
   async findByEmail(email: string): Promise<User | null> {
-    return this.users.find((u) => u.email.toLowerCase() === email.toLowerCase()) || null;
+    return (
+      this.users.find((u) => u.email.toLowerCase() === email.toLowerCase()) ||
+      null
+    );
   }
 
   async findById(id: string): Promise<User | null> {
     return this.users.find((u) => u.id === id) || null;
   }
 
-  async create(data: { name: string; email: string; passwordHash: string }): Promise<User> {
+  async findByGoogleId(googleId: string): Promise<User | null> {
+    return this.users.find((u) => u.googleId === googleId) || null;
+  }
+
+  async create(data: {
+    name: string;
+    email: string;
+    passwordHash: string;
+  }): Promise<User> {
     const user: User = {
       id: `user-${Date.now()}-${Math.random().toString(36).substring(7)}`,
       name: data.name,
       email: data.email,
       passwordHash: data.passwordHash,
+      googleId: null,
+      avatarUrl: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
     this.users.push(user);
+    return user;
+  }
+
+  async createWithGoogle(data: {
+    name: string;
+    email: string;
+    googleId: string;
+    avatarUrl?: string | null;
+  }): Promise<User> {
+    const user: User = {
+      id: `user-g-${Date.now()}-${Math.random().toString(36).substring(7)}`,
+      name: data.name,
+      email: data.email,
+      passwordHash: null,
+      googleId: data.googleId,
+      avatarUrl: data.avatarUrl || null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    this.users.push(user);
+    return user;
+  }
+
+  async updateGoogleId(
+    id: string,
+    googleId: string,
+    avatarUrl?: string | null,
+  ): Promise<User> {
+    const user = this.users.find((u) => u.id === id);
+    if (!user) throw new Error('User not found');
+    user.googleId = googleId;
+    if (avatarUrl) user.avatarUrl = avatarUrl;
+    user.updatedAt = new Date();
     return user;
   }
 }
@@ -35,7 +81,11 @@ export class InMemoryUserRepository implements IUserRepository {
 export class InMemorySongRequestRepository implements ISongRequestRepository {
   public songs: (SongRequest & { user: { name: string } })[] = [];
 
-  async create(data: { songName: string; artist?: string; userId: string }): Promise<SongRequest> {
+  async create(data: {
+    songName: string;
+    artist?: string;
+    userId: string;
+  }): Promise<SongRequest> {
     const song: SongRequest & { user: { name: string } } = {
       id: `song-${Date.now()}`,
       songName: data.songName,
@@ -49,7 +99,9 @@ export class InMemorySongRequestRepository implements ISongRequestRepository {
     return song;
   }
 
-  async findAll(limit: number): Promise<(SongRequest & { user: { name: string } })[]> {
+  async findAll(
+    limit: number,
+  ): Promise<(SongRequest & { user: { name: string } })[]> {
     return this.songs.slice(0, limit);
   }
 }
@@ -57,7 +109,10 @@ export class InMemorySongRequestRepository implements ISongRequestRepository {
 export class InMemoryPrayerRequestRepository implements IPrayerRequestRepository {
   public prayers: (PrayerRequest & { user: { name: string } })[] = [];
 
-  async create(data: { message: string; userId: string }): Promise<PrayerRequest> {
+  async create(data: {
+    message: string;
+    userId: string;
+  }): Promise<PrayerRequest> {
     const prayer: PrayerRequest & { user: { name: string } } = {
       id: `prayer-${Date.now()}`,
       message: data.message,
@@ -70,7 +125,9 @@ export class InMemoryPrayerRequestRepository implements IPrayerRequestRepository
     return prayer;
   }
 
-  async findAll(limit: number): Promise<(PrayerRequest & { user: { name: string } })[]> {
+  async findAll(
+    limit: number,
+  ): Promise<(PrayerRequest & { user: { name: string } })[]> {
     return this.prayers.slice(0, limit);
   }
 }
@@ -78,7 +135,10 @@ export class InMemoryPrayerRequestRepository implements IPrayerRequestRepository
 export class InMemoryBoardMessageRepository implements IBoardMessageRepository {
   public messages: (BoardMessage & { user: { name: string } })[] = [];
 
-  async create(data: { message: string; userId: string }): Promise<BoardMessage> {
+  async create(data: {
+    message: string;
+    userId: string;
+  }): Promise<BoardMessage> {
     const item: BoardMessage & { user: { name: string } } = {
       id: `board-${Date.now()}`,
       message: data.message,
@@ -91,7 +151,9 @@ export class InMemoryBoardMessageRepository implements IBoardMessageRepository {
     return item;
   }
 
-  async findApproved(limit: number): Promise<(BoardMessage & { user: { name: string } })[]> {
+  async findApproved(
+    limit: number,
+  ): Promise<(BoardMessage & { user: { name: string } })[]> {
     return this.messages.filter((m) => m.approved).slice(0, limit);
   }
 }

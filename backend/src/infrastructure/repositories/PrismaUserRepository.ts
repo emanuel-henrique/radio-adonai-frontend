@@ -15,7 +15,45 @@ export class PrismaUserRepository implements IUserRepository {
     return prisma.user.findUnique({ where: { id } });
   }
 
-  async create(data: { name: string; email: string; passwordHash: string }): Promise<User> {
+  async findByGoogleId(googleId: string): Promise<User | null> {
+    return prisma.user.findUnique({ where: { googleId } });
+  }
+
+  async create(data: {
+    name: string;
+    email: string;
+    passwordHash: string;
+  }): Promise<User> {
     return prisma.user.create({ data });
+  }
+
+  async createWithGoogle(data: {
+    name: string;
+    email: string;
+    googleId: string;
+    avatarUrl?: string | null;
+  }): Promise<User> {
+    return prisma.user.create({
+      data: {
+        name: data.name,
+        email: data.email,
+        googleId: data.googleId,
+        avatarUrl: data.avatarUrl || null,
+      },
+    });
+  }
+
+  async updateGoogleId(
+    id: string,
+    googleId: string,
+    avatarUrl?: string | null,
+  ): Promise<User> {
+    return prisma.user.update({
+      where: { id },
+      data: {
+        googleId,
+        ...(avatarUrl ? { avatarUrl } : {}),
+      },
+    });
   }
 }

@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { registerSchema, loginSchema } from './auth.schema.js';
+import {
+  registerSchema,
+  loginSchema,
+  googleAuthSchema,
+} from './auth.schema.js';
 import { createSongSchema } from './song.schema.js';
 import { createPrayerSchema } from './prayer.schema.js';
 import { createBoardSchema } from './board.schema.js';
@@ -30,7 +34,9 @@ describe('Zod Validation Schemas', () => {
 
       expect(parsed.success).toBe(false);
       if (!parsed.success) {
-        const emailIssue = parsed.error.issues.find((i) => i.path.includes('email'));
+        const emailIssue = parsed.error.issues.find((i) =>
+          i.path.includes('email'),
+        );
         expect(emailIssue).toBeDefined();
       }
     });
@@ -44,7 +50,9 @@ describe('Zod Validation Schemas', () => {
 
       expect(parsed.success).toBe(false);
       if (!parsed.success) {
-        const passIssue = parsed.error.issues.find((i) => i.path.includes('password'));
+        const passIssue = parsed.error.issues.find((i) =>
+          i.path.includes('password'),
+        );
         expect(passIssue).toBeDefined();
         expect(passIssue?.message).toContain('6 caracteres');
       }
@@ -78,6 +86,18 @@ describe('Zod Validation Schemas', () => {
       });
 
       expect(parsed.success).toBe(false);
+    });
+  });
+
+  describe('googleAuthSchema', () => {
+    it('deve aprovar idToken válido', () => {
+      const parsed = googleAuthSchema.safeParse({ idToken: 'google-id-token' });
+      expect(parsed.success).toBe(true);
+    });
+
+    it('deve rejeitar idToken ausente ou vazio', () => {
+      expect(googleAuthSchema.safeParse({}).success).toBe(false);
+      expect(googleAuthSchema.safeParse({ idToken: '' }).success).toBe(false);
     });
   });
 

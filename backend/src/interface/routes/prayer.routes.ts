@@ -1,10 +1,16 @@
 import { FastifyInstance } from 'fastify';
-import { CreatePrayerRequestUseCase, ListPrayerRequestsUseCase } from '../../application/use-cases/PrayerRequestUseCases.js';
+import {
+  CreatePrayerRequestUseCase,
+  ListPrayerRequestsUseCase,
+} from '../../application/use-cases/PrayerRequestUseCases.js';
 import { IPrayerRequestRepository } from '../../domain/repositories/IPrayerRequestRepository.js';
 import { AppError } from '../../domain/errors/AppError.js';
 import { authenticate } from '../middleware/auth.middleware.js';
 import { validateBody } from '../middleware/validate.middleware.js';
-import { createPrayerSchema, CreatePrayerInput } from '../schemas/prayer.schema.js';
+import {
+  createPrayerSchema,
+  CreatePrayerInput,
+} from '../schemas/prayer.schema.js';
 
 /**
  * Rotas de pedidos de oração.
@@ -40,7 +46,9 @@ export function prayerRoutes(prayerRepo: IPrayerRequestRepository) {
         return reply.send(result);
       } catch (err) {
         request.log.error(err);
-        return reply.status(500).send({ error: 'Erro ao buscar pedidos de oração.' });
+        return reply
+          .status(500)
+          .send({ error: 'Erro ao buscar pedidos de oração.' });
       }
     });
   };

@@ -1,5 +1,8 @@
 import { FastifyInstance } from 'fastify';
-import { CreateSongRequestUseCase, ListSongRequestsUseCase } from '../../application/use-cases/SongRequestUseCases.js';
+import {
+  CreateSongRequestUseCase,
+  ListSongRequestsUseCase,
+} from '../../application/use-cases/SongRequestUseCases.js';
 import { ISongRequestRepository } from '../../domain/repositories/ISongRequestRepository.js';
 import { AppError } from '../../domain/errors/AppError.js';
 import { authenticate } from '../middleware/auth.middleware.js';
@@ -22,7 +25,11 @@ export function songRoutes(songRepo: ISongRequestRepository) {
         try {
           const { songName, artist } = request.body;
           const userId = (request as any).user.userId;
-          const result = await createUseCase.execute({ songName, artist: artist || undefined, userId });
+          const result = await createUseCase.execute({
+            songName,
+            artist: artist || undefined,
+            userId,
+          });
           return reply.status(201).send(result);
         } catch (err) {
           if (err instanceof AppError) {
@@ -40,7 +47,9 @@ export function songRoutes(songRepo: ISongRequestRepository) {
         return reply.send(result);
       } catch (err) {
         request.log.error(err);
-        return reply.status(500).send({ error: 'Erro ao buscar pedidos de música.' });
+        return reply
+          .status(500)
+          .send({ error: 'Erro ao buscar pedidos de música.' });
       }
     });
   };

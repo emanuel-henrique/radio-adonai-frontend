@@ -1,10 +1,16 @@
 import { FastifyInstance } from 'fastify';
-import { CreateBoardMessageUseCase, ListBoardMessagesUseCase } from '../../application/use-cases/BoardMessageUseCases.js';
+import {
+  CreateBoardMessageUseCase,
+  ListBoardMessagesUseCase,
+} from '../../application/use-cases/BoardMessageUseCases.js';
 import { IBoardMessageRepository } from '../../domain/repositories/IBoardMessageRepository.js';
 import { AppError } from '../../domain/errors/AppError.js';
 import { authenticate } from '../middleware/auth.middleware.js';
 import { validateBody } from '../middleware/validate.middleware.js';
-import { createBoardSchema, CreateBoardInput } from '../schemas/board.schema.js';
+import {
+  createBoardSchema,
+  CreateBoardInput,
+} from '../schemas/board.schema.js';
 
 /**
  * Rotas do mural de recados.
@@ -40,7 +46,9 @@ export function boardRoutes(boardRepo: IBoardMessageRepository) {
         return reply.send(result);
       } catch (err) {
         request.log.error(err);
-        return reply.status(500).send({ error: 'Erro ao buscar mensagens do mural.' });
+        return reply
+          .status(500)
+          .send({ error: 'Erro ao buscar mensagens do mural.' });
       }
     });
   };

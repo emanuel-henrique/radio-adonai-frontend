@@ -1,5 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { CreateBoardMessageUseCase, ListBoardMessagesUseCase } from './BoardMessageUseCases.js';
+import {
+  CreateBoardMessageUseCase,
+  ListBoardMessagesUseCase,
+} from './BoardMessageUseCases.js';
 import { InMemoryBoardMessageRepository } from '../../test/in-memory-repositories.js';
 import { AppError } from '../../domain/errors/AppError.js';
 
@@ -19,7 +22,9 @@ describe('BoardMessageUseCases', () => {
     });
 
     expect(message.id).toBeDefined();
-    expect(message.message).toBe('A paz do Senhor a todos os ouvintes da rádio!');
+    expect(message.message).toBe(
+      'A paz do Senhor a todos os ouvintes da rádio!',
+    );
   });
 
   it('deve falhar se mensagem estiver vazia', async () => {

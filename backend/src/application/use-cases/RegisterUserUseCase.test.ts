@@ -28,7 +28,10 @@ describe('RegisterUserUseCase', () => {
     // Senha salva deve estar hasheada
     const saved = await userRepo.findByEmail('joao@example.com');
     expect(saved).not.toBeNull();
-    const isPasswordHashed = await bcrypt.compare('password123', saved!.passwordHash);
+    const isPasswordHashed = await bcrypt.compare(
+      'password123',
+      saved!.passwordHash!,
+    );
     expect(isPasswordHashed).toBe(true);
   });
 

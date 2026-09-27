@@ -8,5 +8,21 @@ import { User } from '../entities/User.js';
 export interface IUserRepository {
   findByEmail(email: string): Promise<User | null>;
   findById(id: string): Promise<User | null>;
-  create(data: { name: string; email: string; passwordHash: string }): Promise<User>;
+  findByGoogleId(googleId: string): Promise<User | null>;
+  create(data: {
+    name: string;
+    email: string;
+    passwordHash: string;
+  }): Promise<User>;
+  createWithGoogle(data: {
+    name: string;
+    email: string;
+    googleId: string;
+    avatarUrl?: string | null;
+  }): Promise<User>;
+  updateGoogleId(
+    id: string,
+    googleId: string,
+    avatarUrl?: string | null,
+  ): Promise<User>;
 }

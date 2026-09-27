@@ -3,11 +3,16 @@ import { PrayerRequest } from '../../domain/entities/PrayerRequest.js';
 import { prisma } from '../prisma.js';
 
 export class PrismaPrayerRequestRepository implements IPrayerRequestRepository {
-  async create(data: { message: string; userId: string }): Promise<PrayerRequest> {
+  async create(data: {
+    message: string;
+    userId: string;
+  }): Promise<PrayerRequest> {
     return prisma.prayerRequest.create({ data });
   }
 
-  async findAll(limit: number): Promise<(PrayerRequest & { user: { name: string } })[]> {
+  async findAll(
+    limit: number,
+  ): Promise<(PrayerRequest & { user: { name: string } })[]> {
     return prisma.prayerRequest.findMany({
       orderBy: { createdAt: 'desc' },
       take: limit,

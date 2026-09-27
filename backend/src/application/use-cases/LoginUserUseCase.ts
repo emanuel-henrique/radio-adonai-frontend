@@ -31,6 +31,13 @@ export class LoginUserUseCase {
       throw new AppError('Credenciais inválidas.', 401);
     }
 
+    if (!user.passwordHash) {
+      throw new AppError(
+        'Esta conta usa login com Google. Entre com o Google.',
+        401,
+      );
+    }
+
     const valid = await bcrypt.compare(input.password, user.passwordHash);
     if (!valid) {
       throw new AppError('Credenciais inválidas.', 401);

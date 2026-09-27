@@ -1,5 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { CreatePrayerRequestUseCase, ListPrayerRequestsUseCase } from './PrayerRequestUseCases.js';
+import {
+  CreatePrayerRequestUseCase,
+  ListPrayerRequestsUseCase,
+} from './PrayerRequestUseCases.js';
 import { InMemoryPrayerRequestRepository } from '../../test/in-memory-repositories.js';
 import { AppError } from '../../domain/errors/AppError.js';
 

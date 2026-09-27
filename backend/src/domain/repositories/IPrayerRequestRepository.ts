@@ -5,5 +5,7 @@ import { PrayerRequest } from '../entities/PrayerRequest.js';
  */
 export interface IPrayerRequestRepository {
   create(data: { message: string; userId: string }): Promise<PrayerRequest>;
-  findAll(limit: number): Promise<(PrayerRequest & { user: { name: string } })[]>;
+  findAll(
+    limit: number,
+  ): Promise<(PrayerRequest & { user: { name: string } })[]>;
 }

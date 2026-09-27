@@ -7,6 +7,29 @@ import {
   InMemoryBoardMessageRepository,
 } from '../../test/in-memory-repositories.js';
 import { FastifyInstance } from 'fastify';
+import { AppError } from '../../domain/errors/AppError.js';
+import {
+  IGoogleAuthProvider,
+  GoogleUserData,
+} from '../../domain/providers/IGoogleAuthProvider.js';
+
+class FakeGoogleAuthProvider implements IGoogleAuthProvider {
+  public user: GoogleUserData = {
+    googleId: 'google-abc-123',
+    email: 'novo@adonai.com',
+    name: 'Irmão Google',
+    avatarUrl: 'https://lh3.googleusercontent.com/photo.jpg',
+  };
+
+  public shouldFail = false;
+
+  async verifyIdToken(_idToken: string): Promise<GoogleUserData> {
+    if (this.shouldFail) {
+      throw new AppError('Falha ao autenticar com o Google.', 401);
+    }
+    return this.user;
+  }
+}
 
 describe('API Routes Integration Tests (with Zod & Clean Architecture)', () => {
   let app: FastifyInstance;
@@ -14,6 +37,7 @@ describe('API Routes Integration Tests (with Zod & Clean Architecture)', () => {
   let songRepo: InMemorySongRequestRepository;
   let prayerRepo: InMemoryPrayerRequestRepository;
   let boardRepo: InMemoryBoardMessageRepository;
+  let googleProvider: FakeGoogleAuthProvider;
   let authToken: string;
 
   beforeEach(async () => {
@@ -21,12 +45,14 @@ describe('API Routes Integration Tests (with Zod & Clean Architecture)', () => {
     songRepo = new InMemorySongRequestRepository();
     prayerRepo = new InMemoryPrayerRequestRepository();
     boardRepo = new InMemoryBoardMessageRepository();
+    googleProvider = new FakeGoogleAuthProvider();
 
     app = buildApp({
       userRepository: userRepo,
       songRepository: songRepo,
       prayerRepository: prayerRepo,
       boardRepository: boardRepo,
+      googleAuthProvider: googleProvider,
       logger: false,
     });
 
@@ -162,6 +188,72 @@ describe('API Routes Integration Tests (with Zod & Clean Architecture)', () => {
     });
   });
 
+  describe('POST /auth/google', () => {
+    it('deve autenticar com Google e criar o usuário (200)', async () => {
+      const response = await app.inject({
+        method: 'POST',
+        url: '/auth/google',
+        payload: { idToken: 'google-id-token-valido' },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const data = JSON.parse(response.payload);
+      expect(data.token).toBeDefined();
+      expect(data.user.email).toBe('novo@adonai.com');
+      expect(data.user.avatarUrl).toBe(
+        'https://lh3.googleusercontent.com/photo.jpg',
+      );
+
+      const saved = await userRepo.findByGoogleId('google-abc-123');
+      expect(saved?.email).toBe('novo@adonai.com');
+    });
+
+    it('deve vincular a conta Google ao usuário já cadastrado por senha', async () => {
+      googleProvider.user.email = 'teste@adonai.com';
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/auth/google',
+        payload: { idToken: 'google-id-token-valido' },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const data = JSON.parse(response.payload);
+      expect(data.user.email).toBe('teste@adonai.com');
+
+      const linked = await userRepo.findByEmail('teste@adonai.com');
+      expect(linked?.googleId).toBe('google-abc-123');
+      expect(linked?.passwordHash).not.toBeNull();
+    });
+
+    it('deve retornar 400 se idToken não for enviado (validação Zod)', async () => {
+      const response = await app.inject({
+        method: 'POST',
+        url: '/auth/google',
+        payload: {},
+      });
+
+      expect(response.statusCode).toBe(400);
+      const data = JSON.parse(response.payload);
+      expect(data.error).toBe('Dados inválidos.');
+      expect(data.details.some((d: any) => d.field === 'idToken')).toBe(true);
+    });
+
+    it('deve retornar 401 se o token do Google for inválido', async () => {
+      googleProvider.shouldFail = true;
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/auth/google',
+        payload: { idToken: 'token-invalido' },
+      });
+
+      expect(response.statusCode).toBe(401);
+      const data = JSON.parse(response.payload);
+      expect(data.error).toBe('Falha ao autenticar com o Google.');
+    });
+  });
+
   describe('Rotas de Músicas (/songs)', () => {
     it('deve rejeitar POST /songs com 401 se não enviar token de autenticação', async () => {
       const response = await app.inject({
@@ -261,7 +353,9 @@ describe('API Routes Integration Tests (with Zod & Clean Architecture)', () => {
 
       expect(response.statusCode).toBe(201);
       const data = JSON.parse(response.payload);
-      expect(data.message).toBe('Orem pelo nosso pastor e ministério de louvor.');
+      expect(data.message).toBe(
+        'Orem pelo nosso pastor e ministério de louvor.',
+      );
     });
 
     it('deve listar pedidos de oração em GET /prayers (200)', async () => {
@@ -308,7 +402,9 @@ describe('API Routes Integration Tests (with Zod & Clean Architecture)', () => {
 
       expect(response.statusCode).toBe(201);
       const data = JSON.parse(response.payload);
-      expect(data.message).toBe('Culto de jovens neste sábado às 19h! Não perca!');
+      expect(data.message).toBe(
+        'Culto de jovens neste sábado às 19h! Não perca!',
+      );
     });
 
     it('deve listar recados do mural em GET /board (200)', async () => {

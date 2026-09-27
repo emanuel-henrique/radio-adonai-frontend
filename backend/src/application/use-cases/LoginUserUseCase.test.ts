@@ -49,4 +49,19 @@ describe('LoginUserUseCase', () => {
       }),
     ).rejects.toThrow(AppError);
   });
+
+  it('deve lançar erro 401 ao tentar login com senha em conta que só usa Google', async () => {
+    await userRepo.createWithGoogle({
+      name: 'Irmão Google',
+      email: 'google@example.com',
+      googleId: 'google-999',
+    });
+
+    await expect(
+      useCase.execute({
+        email: 'google@example.com',
+        password: 'qualquersenha',
+      }),
+    ).rejects.toThrow('Esta conta usa login com Google. Entre com o Google.');
+  });
 });

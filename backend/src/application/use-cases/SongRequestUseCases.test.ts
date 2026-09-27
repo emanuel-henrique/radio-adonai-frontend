@@ -1,5 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { CreateSongRequestUseCase, ListSongRequestsUseCase } from './SongRequestUseCases.js';
+import {
+  CreateSongRequestUseCase,
+  ListSongRequestsUseCase,
+} from './SongRequestUseCases.js';
 import { InMemorySongRequestRepository } from '../../test/in-memory-repositories.js';
 import { AppError } from '../../domain/errors/AppError.js';
 

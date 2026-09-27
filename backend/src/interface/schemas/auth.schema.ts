@@ -23,10 +23,15 @@ export const loginSchema = z.object({
     .trim()
     .email('Formato de email inválido.')
     .toLowerCase(),
-  password: z
-    .string('A senha é obrigatória.')
-    .min(1, 'A senha é obrigatória.'),
+  password: z.string('A senha é obrigatória.').min(1, 'A senha é obrigatória.'),
+});
+
+export const googleAuthSchema = z.object({
+  idToken: z
+    .string('O token do Google é obrigatório.')
+    .min(1, 'O token do Google é obrigatório.'),
 });
 
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
+export type GoogleAuthInput = z.infer<typeof googleAuthSchema>;

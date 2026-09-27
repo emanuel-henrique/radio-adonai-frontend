@@ -63,11 +63,19 @@ const pt = {
   'profile.createSubtitle': 'Crie uma conta para pedir músicas e orações.',
   'profile.loginSubtitle': 'Faça login para participar da programação.',
   'profile.emailPlaceholder': 'Seu e-mail',
+  'profile.namePlaceholder': 'Seu nome',
   'profile.passwordPlaceholder': 'Crie uma senha',
   'profile.register': 'Cadastrar',
   'profile.login': 'Entrar',
   'profile.hasAccount': 'Já tem uma conta? Faça login',
   'profile.noAccount': 'Não tem conta? Cadastre-se',
+  'auth.password': 'Sua senha',
+  'auth.or': 'ou',
+  'auth.loading': 'Aguarde...',
+  'auth.unexpectedError': 'Não foi possível concluir. Tente novamente.',
+  'auth.googleNotConfigured':
+    'Login com Google indisponível: configure NEXT_PUBLIC_GOOGLE_CLIENT_ID.',
+  'auth.googleUnavailable': 'Não foi possível carregar o botão do Google.',
 } as const;
 
 const en: Record<keyof typeof pt, string> = {
@@ -121,11 +129,19 @@ const en: Record<keyof typeof pt, string> = {
   'profile.createSubtitle': 'Create an account to request songs and prayers.',
   'profile.loginSubtitle': 'Sign in to participate in the programming.',
   'profile.emailPlaceholder': 'Your email',
+  'profile.namePlaceholder': 'Your name',
   'profile.passwordPlaceholder': 'Create a password',
   'profile.register': 'Register',
   'profile.login': 'Sign In',
   'profile.hasAccount': 'Already have an account? Sign in',
   'profile.noAccount': "Don't have an account? Register",
+  'auth.password': 'Your password',
+  'auth.or': 'or',
+  'auth.loading': 'Please wait...',
+  'auth.unexpectedError': "We couldn't complete the request. Please try again.",
+  'auth.googleNotConfigured':
+    'Google sign-in unavailable: set NEXT_PUBLIC_GOOGLE_CLIENT_ID.',
+  'auth.googleUnavailable': 'Could not load the Google button.',
 };
 
 const es: Record<keyof typeof pt, string> = {
@@ -179,11 +195,19 @@ const es: Record<keyof typeof pt, string> = {
   'profile.createSubtitle': 'Crea una cuenta para pedir músicas y oraciones.',
   'profile.loginSubtitle': 'Inicia sesión para participar en la programación.',
   'profile.emailPlaceholder': 'Tu correo electrónico',
+  'profile.namePlaceholder': 'Tu nombre',
   'profile.passwordPlaceholder': 'Crea una contraseña',
   'profile.register': 'Registrarse',
   'profile.login': 'Entrar',
   'profile.hasAccount': '¿Ya tienes cuenta? Inicia sesión',
   'profile.noAccount': '¿No tienes cuenta? Regístrate',
+  'auth.password': 'Tu contraseña',
+  'auth.or': 'o',
+  'auth.loading': 'Espera...',
+  'auth.unexpectedError': 'No pudimos completar la solicitud. Inténtalo de nuevo.',
+  'auth.googleNotConfigured':
+    'Acceso con Google no disponible: configura NEXT_PUBLIC_GOOGLE_CLIENT_ID.',
+  'auth.googleUnavailable': 'No se pudo cargar el botón de Google.',
 };
 
 export type TranslationKey = keyof typeof pt;

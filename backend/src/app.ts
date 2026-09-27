@@ -14,11 +14,14 @@ import { PrismaSongRequestRepository } from './infrastructure/repositories/Prism
 import { PrismaPrayerRequestRepository } from './infrastructure/repositories/PrismaPrayerRequestRepository.js';
 import { PrismaBoardMessageRepository } from './infrastructure/repositories/PrismaBoardMessageRepository.js';
 
+import { IGoogleAuthProvider } from './domain/providers/IGoogleAuthProvider.js';
+
 export interface AppDependencies {
   userRepository?: IUserRepository;
   songRepository?: ISongRequestRepository;
   prayerRepository?: IPrayerRequestRepository;
   boardRepository?: IBoardMessageRepository;
+  googleAuthProvider?: IGoogleAuthProvider;
   logger?: boolean;
 }
 
@@ -51,12 +54,15 @@ export function buildApp(dependencies?: AppDependencies): FastifyInstance {
 
   // Resolver dependências dos repositórios
   const userRepo = dependencies?.userRepository ?? new PrismaUserRepository();
-  const songRepo = dependencies?.songRepository ?? new PrismaSongRequestRepository();
-  const prayerRepo = dependencies?.prayerRepository ?? new PrismaPrayerRequestRepository();
-  const boardRepo = dependencies?.boardRepository ?? new PrismaBoardMessageRepository();
+  const songRepo =
+    dependencies?.songRepository ?? new PrismaSongRequestRepository();
+  const prayerRepo =
+    dependencies?.prayerRepository ?? new PrismaPrayerRequestRepository();
+  const boardRepo =
+    dependencies?.boardRepository ?? new PrismaBoardMessageRepository();
 
   // Registrar rotas conectando os casos de uso aos repositórios
-  app.register(authRoutes(userRepo));
+  app.register(authRoutes(userRepo, dependencies?.googleAuthProvider));
   app.register(songRoutes(songRepo));
   app.register(prayerRoutes(prayerRepo));
   app.register(boardRoutes(boardRepo));

@@ -2,14 +2,31 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { htmlLangMap, Language } from '@/i18n/translations';
+import {
+  AuthResponse,
+  AuthUser,
+  loginUser,
+  loginWithGoogle,
+  registerUser,
+} from '@/lib/api';
 
 type Theme = 'dark' | 'light';
 type FontSize = 'small' | 'medium' | 'large';
 
+const TOKEN_KEY = 'adonai_token';
+const USER_KEY = 'adonai_user';
+
 interface AppContextType {
   isLoggedIn: boolean;
-  user: { name: string; email: string } | null;
-  login: (email: string) => void;
+  user: AuthUser | null;
+  token: string | null;
+  signInWithEmail: (email: string, password: string) => Promise<void>;
+  signUpWithEmail: (
+    name: string,
+    email: string,
+    password: string,
+  ) => Promise<void>;
+  signInWithGoogle: (idToken: string) => Promise<void>;
   logout: () => void;
   theme: Theme;
   toggleTheme: () => void;
@@ -29,7 +46,8 @@ function applyDocumentPreferences(theme: Theme, fontSize: FontSize, language: La
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [theme, setTheme] = useState<Theme>('dark');
   const [fontSize, setFontSizeState] = useState<FontSize>('medium');
   const [language, setLanguageState] = useState<Language>('pt');
@@ -38,30 +56,48 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const savedTheme = (localStorage.getItem('theme') as Theme) || 'dark';
     const savedFontSize = (localStorage.getItem('fontSize') as FontSize) || 'medium';
     const savedLang = (localStorage.getItem('language') as Language) || 'pt';
-    const savedUser = localStorage.getItem('user');
+    const savedToken = localStorage.getItem(TOKEN_KEY);
+    const savedUser = localStorage.getItem(USER_KEY);
 
     setTheme(savedTheme);
     setFontSizeState(savedFontSize);
     setLanguageState(savedLang);
     applyDocumentPreferences(savedTheme, savedFontSize, savedLang);
+    localStorage.removeItem('user');
 
-    if (savedUser) {
-      setIsLoggedIn(true);
+    if (savedToken && savedUser) {
+      setToken(savedToken);
       setUser(JSON.parse(savedUser));
+      setIsLoggedIn(true);
     }
   }, []);
 
-  const login = (email: string) => {
-    const mockUser = { name: email.split('@')[0], email };
+  const storeSession = (session: AuthResponse) => {
+    setToken(session.token);
+    setUser(session.user);
     setIsLoggedIn(true);
-    setUser(mockUser);
-    localStorage.setItem('user', JSON.stringify(mockUser));
+    localStorage.setItem(TOKEN_KEY, session.token);
+    localStorage.setItem(USER_KEY, JSON.stringify(session.user));
+  };
+
+  const signInWithEmail = async (email: string, password: string) => {
+    storeSession(await loginUser({ email, password }));
+  };
+
+  const signUpWithEmail = async (name: string, email: string, password: string) => {
+    storeSession(await registerUser({ name, email, password }));
+  };
+
+  const signInWithGoogle = async (idToken: string) => {
+    storeSession(await loginWithGoogle(idToken));
   };
 
   const logout = () => {
     setIsLoggedIn(false);
     setUser(null);
-    localStorage.removeItem('user');
+    setToken(null);
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
   };
 
   const toggleTheme = () => {
@@ -84,7 +120,23 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AppContext.Provider value={{ isLoggedIn, user, login, logout, theme, toggleTheme, fontSize, setFontSize, language, setLanguage }}>
+    <AppContext.Provider
+      value={{
+        isLoggedIn,
+        user,
+        token,
+        signInWithEmail,
+        signUpWithEmail,
+        signInWithGoogle,
+        logout,
+        theme,
+        toggleTheme,
+        fontSize,
+        setFontSize,
+        language,
+        setLanguage,
+      }}
+    >
       {children}
     </AppContext.Provider>
   );
