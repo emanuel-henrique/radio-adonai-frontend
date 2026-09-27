@@ -1,0 +1,7 @@
+name = "radio-adonai-proxy"
+main = "src/index.ts"
+compatibility_date = "2026-09-01"
+
+# O plano free do Cloudflare publica em <name>.<seu-subdomain>.workers.dev com
+# HTTPS automático. Não há limite de duração para Workers acionados por HTTP,
+# que é o que permite manter o stream aberto enquanto alguém estiver ouvindo.

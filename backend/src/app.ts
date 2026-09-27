@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import type { IncomingMessage, ServerResponse } from 'node:http';
 import Fastify, { FastifyInstance } from 'fastify';
 import cors from '@fastify/cors';
 import { authRoutes } from './interface/routes/auth.routes.js';
@@ -77,4 +78,16 @@ export function buildApp(dependencies?: AppDependencies): FastifyInstance {
   );
 
   return app;
+}
+
+const vercelApp = buildApp({ logger: process.env.NODE_ENV !== 'test' });
+let vercelReady: PromiseLike<void> | undefined;
+
+export default async function handler(
+  request: IncomingMessage,
+  response: ServerResponse,
+): Promise<void> {
+  if (!vercelReady) vercelReady = vercelApp.ready().then(() => {});
+  await vercelReady;
+  vercelApp.server.emit('request', request, response);
 }

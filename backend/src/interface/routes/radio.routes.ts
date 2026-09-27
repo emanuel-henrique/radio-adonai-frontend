@@ -10,6 +10,12 @@ import { AppError } from '../../domain/errors/AppError.js';
  * Existe porque o Shoutcast serve AAC com o Content-Type `audio/aacp`, que os
  * navegadores rejeitam. Aqui o corpo é repassado byte a byte e apenas o
  * Content-Type é corrigido para `audio/aac` (mesmos bytes, rótulo suportado).
+ *
+ * ATENÇÃO: esta resposta fica aberta enquanto alguém ouve. Em função serverless
+ * a Vercel encerra a invocação após 300 s no plano Hobby e devolve 504, cortando
+ * o áudio no meio da faixa. Em produção o frontend deve apontar para o
+ * Cloudflare Worker do diretório `radio-proxy/`, que não tem limite de duração.
+ * Esta rota serve para desenvolvimento e para hosts com conexão longa.
  */
 export function radioRoutes(
   provider: IShoutcastStreamProvider = new ShoutcastStreamProvider(),
