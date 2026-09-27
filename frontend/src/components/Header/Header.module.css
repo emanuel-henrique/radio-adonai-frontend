@@ -3,6 +3,8 @@
   top: 0;
   left: 0;
   right: 0;
+  width: 100%;
+  box-sizing: border-box;
   height: 4rem;
   background-color: var(--bg-color);
   display: flex;
@@ -43,10 +45,4 @@
 .iconButton:hover {
   background-color: var(--icon-bg);
   color: var(--text-primary);
-}
-
-@media (min-width: 768px) {
-  .header {
-    left: 5rem;
-  }
 }

@@ -1,5 +1,5 @@
 .playerContainer {
-  flex: 1;
+  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -78,7 +78,7 @@
   justify-content: center;
   box-shadow: 0 1.25rem 2.5rem var(--shadow-color);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .artworkPlaceholder {
@@ -90,13 +90,16 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: inherit;
 }
 
 .artworkGlow {
   position: absolute;
-  inset: 0;
+  inset: 0.1875rem;
+  border: 0.1875rem solid rgba(239, 68, 68, 0.55);
+  border-radius: 1.25rem;
   pointer-events: none;
-  box-shadow: inset 0 0 0 0.1875rem rgba(239, 68, 68, 0.55);
+  box-shadow: 0 0 1rem rgba(239, 68, 68, 0.2);
 }
 
 .genre {
@@ -105,6 +108,13 @@
   letter-spacing: 0.08em;
   color: var(--accent-light);
   margin-top: 0.5rem;
+}
+.volumeRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: min(100%, 18rem);
 }
 
 .trackInfo {
@@ -129,8 +139,8 @@
 }
 
 .controls {
-  display: grid;
-  grid-template-columns: 3rem 1fr 7rem;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 0.75rem;
   width: 100%;
@@ -195,6 +205,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  width: 100%;
   min-width: 0;
 }
 
@@ -341,4 +352,65 @@
 
 .modalSubmit:hover {
   background: var(--primary-hover);
+}
+
+@media (min-width: 768px) {
+  .playerContainer {
+    padding-top: 0.75rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .liveIndicator {
+    margin-bottom: 1rem;
+  }
+
+  .artwork {
+    width: 10rem;
+    height: 10rem;
+    margin-bottom: 0.875rem;
+  }
+
+  .trackInfo {
+    margin-bottom: 0.875rem;
+  }
+
+  .programName {
+    font-size: 1.25rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .songName {
+    font-size: 0.9rem;
+  }
+
+  .playButton {
+    width: 4rem;
+    height: 4rem;
+  }
+
+  .controls {
+    gap: 0.5rem;
+  }
+
+  .actionList {
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .actionRow {
+    padding: 0.625rem 0.75rem;
+  }
+
+  .actionIconBox {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .actionTitle {
+    font-size: 0.9rem;
+  }
+
+  .actionSubtitle {
+    font-size: 0.75rem;
+  }
 }

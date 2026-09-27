@@ -97,6 +97,7 @@ body {
 
 .main-content {
   flex: 1;
+  min-height: 0;
   padding-top: 4rem;
   padding-bottom: 5rem;
   display: flex;
@@ -104,13 +105,15 @@ body {
   overflow-y: auto;
 }
 
+.home-page {
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
 @media (min-width: 768px) {
-  .app-layout {
-    flex-direction: row;
-  }
-  .main-content {
-    padding-bottom: 0;
-    margin-left: 5rem;
+  .home-page {
+    align-items: center;
   }
 }
 

@@ -58,23 +58,3 @@
   background-color: var(--icon-bg);
   color: var(--primary-color);
 }
-
-@media (min-width: 768px) {
-  .navigation {
-    top: 0;
-    right: auto;
-    width: 5rem;
-    border-top: none;
-    border-right: 1px solid var(--border-color);
-    padding-bottom: 0;
-    box-shadow: 0.25rem 0 1.5rem var(--shadow-color);
-  }
-
-  .navList {
-    flex-direction: column;
-    justify-content: center;
-    gap: 2rem;
-    height: 100%;
-    padding: 0;
-  }
-}

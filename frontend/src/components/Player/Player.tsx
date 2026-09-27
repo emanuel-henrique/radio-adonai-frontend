@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Modal } from '@/components/Modal/Modal';
-import { useRadioPlayer } from '@/hooks/useRadioPlayer';
+import { useAppContext } from '@/contexts/AppContext';
 import { useTranslation, useIconSize } from '@/i18n/useTranslation';
 import styles from './Player.module.css';
 
@@ -24,10 +24,17 @@ interface PlayerProps {
   listenersCount?: number;
 }
 
-export function Player({ currentProgram, currentSong, listenersCount }: PlayerProps) {
+export function Player({
+  currentProgram,
+  currentSong,
+  listenersCount,
+}: PlayerProps) {
+  const { radio } = useAppContext();
   const { t } = useTranslation();
   const iconSize = useIconSize();
-  const [activeModal, setActiveModal] = useState<'music' | 'prayer' | 'board' | null>(null);
+  const [activeModal, setActiveModal] = useState<
+    'music' | 'prayer' | 'board' | null
+  >(null);
   const [artworkFailed, setArtworkFailed] = useState(false);
 
   const {
@@ -44,14 +51,15 @@ export function Player({ currentProgram, currentSong, listenersCount }: PlayerPr
     retry,
     changeVolume,
     toggleMute,
-  } = useRadioPlayer();
+  } = radio;
 
   const artwork = metadata?.artwork;
   useEffect(() => {
     setArtworkFailed(false);
   }, [artwork]);
 
-  const program = metadata?.title ?? currentProgram ?? t('player.defaultProgram');
+  const program =
+    metadata?.title ?? currentProgram ?? t('player.defaultProgram');
   const song = metadata?.currentTrack ?? currentSong ?? t('player.defaultSong');
   const listeners = metadata?.listeners ?? listenersCount;
 
@@ -90,7 +98,9 @@ export function Player({ currentProgram, currentSong, listenersCount }: PlayerPr
             <Radio size={iconSize.xxl} className={styles.artworkIcon} />
           </div>
         )}
-        {isActive && <div className={styles.artworkGlow}></div>}
+        {isActive && (
+          <div className={styles.artworkGlow} aria-hidden="true"></div>
+        )}
       </div>
 
       <div className={styles.trackInfo}>
@@ -103,27 +113,15 @@ export function Player({ currentProgram, currentSong, listenersCount }: PlayerPr
 
       <div className={styles.controls}>
         <button
-          className={styles.volumeButton}
-          onClick={toggleMute}
-          aria-label={isMuted ? t('player.unmute') : t('player.mute')}
-          aria-pressed={isMuted}
-        >
-          {isMuted ? (
-            <VolumeX size={iconSize.lg} />
-          ) : (
-            <Volume2 size={iconSize.lg} />
-          )}
-        </button>
-
-        <button
           className={styles.playButton}
           onClick={hasStreamError ? retry : togglePlay}
           aria-label={isPlaying ? t('player.pause') : t('player.play')}
         >
           {isBuffering ? (
-            <LoaderCircle size={iconSize.xl} className={`${styles.playIcon} ${styles.spin}`} />
-          ) : hasStreamError ? (
-            <Radio size={iconSize.xl} className={styles.playIcon} />
+            <LoaderCircle
+              size={iconSize.xl}
+              className={`${styles.playIcon} ${styles.spin}`}
+            />
           ) : isPlaying ? (
             <Pause size={iconSize.xl} className={styles.playIcon} />
           ) : (
@@ -131,51 +129,86 @@ export function Player({ currentProgram, currentSong, listenersCount }: PlayerPr
           )}
         </button>
 
-        <div className={styles.volumeControl}>
-          <input
-            type="range"
-            min={0}
-            max={1}
-            step={0.01}
-            value={isMuted ? 0 : volume}
-            onChange={(event) => changeVolume(Number(event.target.value))}
-            className={styles.volumeSlider}
-            aria-label={t('player.volume')}
-          />
+        <div className={styles.volumeRow}>
+          <button
+            className={styles.volumeButton}
+            onClick={toggleMute}
+            aria-label={isMuted ? t('player.unmute') : t('player.mute')}
+            aria-pressed={isMuted}
+          >
+            {isMuted ? (
+              <VolumeX size={iconSize.lg} />
+            ) : (
+              <Volume2 size={iconSize.lg} />
+            )}
+          </button>
+          <div className={styles.volumeControl}>
+            <input
+              type="range"
+              min={0}
+              max={1}
+              step={0.01}
+              value={isMuted ? 0 : volume}
+              onChange={(event) => changeVolume(Number(event.target.value))}
+              className={styles.volumeSlider}
+              aria-label={t('player.volume')}
+            />
+          </div>
         </div>
       </div>
 
-      {hasStreamError && <p className={styles.statusNote}>{t('player.streamError')}</p>}
-      {hasMetadataError && <p className={styles.statusNote}>{t('player.metadataError')}</p>}
+      {hasStreamError && (
+        <p className={styles.statusNote}>{t('player.streamError')}</p>
+      )}
+      {hasMetadataError && (
+        <p className={styles.statusNote}>{t('player.metadataError')}</p>
+      )}
 
       <div className={styles.actionList}>
-        <button className={styles.actionRow} onClick={() => setActiveModal('music')}>
+        <button
+          className={styles.actionRow}
+          onClick={() => setActiveModal('music')}
+        >
           <div className={styles.actionIconBox}>
             <Music size={iconSize.md} />
           </div>
           <div className={styles.actionTexts}>
-            <span className={styles.actionTitle}>{t('player.requestMusic')}</span>
-            <span className={styles.actionSubtitle}>{t('player.requestMusicDesc')}</span>
+            <span className={styles.actionTitle}>
+              {t('player.requestMusic')}
+            </span>
+            <span className={styles.actionSubtitle}>
+              {t('player.requestMusicDesc')}
+            </span>
           </div>
         </button>
 
-        <button className={styles.actionRow} onClick={() => setActiveModal('prayer')}>
+        <button
+          className={styles.actionRow}
+          onClick={() => setActiveModal('prayer')}
+        >
           <div className={styles.actionIconBox}>
             <Heart size={iconSize.md} />
           </div>
           <div className={styles.actionTexts}>
             <span className={styles.actionTitle}>{t('player.prayer')}</span>
-            <span className={styles.actionSubtitle}>{t('player.prayerDesc')}</span>
+            <span className={styles.actionSubtitle}>
+              {t('player.prayerDesc')}
+            </span>
           </div>
         </button>
 
-        <button className={styles.actionRow} onClick={() => setActiveModal('board')}>
+        <button
+          className={styles.actionRow}
+          onClick={() => setActiveModal('board')}
+        >
           <div className={styles.actionIconBox}>
             <MessageSquare size={iconSize.md} />
           </div>
           <div className={styles.actionTexts}>
             <span className={styles.actionTitle}>{t('player.board')}</span>
-            <span className={styles.actionSubtitle}>{t('player.boardDesc')}</span>
+            <span className={styles.actionSubtitle}>
+              {t('player.boardDesc')}
+            </span>
           </div>
         </button>
       </div>
@@ -193,7 +226,10 @@ export function Player({ currentProgram, currentSong, listenersCount }: PlayerPr
           placeholder={t('player.musicModal.placeholder')}
           className={styles.modalInput}
         />
-        <button className={styles.modalSubmit} onClick={() => setActiveModal(null)}>
+        <button
+          className={styles.modalSubmit}
+          onClick={() => setActiveModal(null)}
+        >
           {t('player.musicModal.submit')}
         </button>
       </Modal>
@@ -210,7 +246,10 @@ export function Player({ currentProgram, currentSong, listenersCount }: PlayerPr
           placeholder={t('player.prayerModal.placeholder')}
           className={styles.modalTextarea}
         />
-        <button className={styles.modalSubmit} onClick={() => setActiveModal(null)}>
+        <button
+          className={styles.modalSubmit}
+          onClick={() => setActiveModal(null)}
+        >
           {t('player.prayerModal.submit')}
         </button>
       </Modal>

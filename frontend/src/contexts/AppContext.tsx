@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { htmlLangMap, Language } from '@/i18n/translations';
+import { useRadioPlayer } from '@/hooks/useRadioPlayer';
 import {
   AuthResponse,
   AuthUser,
@@ -34,17 +35,23 @@ interface AppContextType {
   setFontSize: (size: FontSize) => void;
   language: Language;
   setLanguage: (lang: Language) => void;
+  radio: ReturnType<typeof useRadioPlayer>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-function applyDocumentPreferences(theme: Theme, fontSize: FontSize, language: Language) {
+function applyDocumentPreferences(
+  theme: Theme,
+  fontSize: FontSize,
+  language: Language,
+) {
   document.documentElement.setAttribute('data-theme', theme);
   document.documentElement.setAttribute('data-font-size', fontSize);
   document.documentElement.lang = htmlLangMap[language];
 }
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
+  const radio = useRadioPlayer();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<AuthUser | null>(null);
   const [token, setToken] = useState<string | null>(null);
@@ -54,7 +61,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const savedTheme = (localStorage.getItem('theme') as Theme) || 'dark';
-    const savedFontSize = (localStorage.getItem('fontSize') as FontSize) || 'medium';
+    const savedFontSize =
+      (localStorage.getItem('fontSize') as FontSize) || 'medium';
     const savedLang = (localStorage.getItem('language') as Language) || 'pt';
     const savedToken = localStorage.getItem(TOKEN_KEY);
     const savedUser = localStorage.getItem(USER_KEY);
@@ -84,7 +92,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     storeSession(await loginUser({ email, password }));
   };
 
-  const signUpWithEmail = async (name: string, email: string, password: string) => {
+  const signUpWithEmail = async (
+    name: string,
+    email: string,
+    password: string,
+  ) => {
     storeSession(await registerUser({ name, email, password }));
   };
 
@@ -135,6 +147,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setFontSize,
         language,
         setLanguage,
+        radio,
       }}
     >
       {children}

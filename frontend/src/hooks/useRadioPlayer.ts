@@ -13,7 +13,9 @@ const DEFAULT_VOLUME = 0.8;
 const DEFAULT_POLL_INTERVAL = 10_000;
 
 function readStoredVolume(): number {
-  const stored = Number.parseFloat(window.localStorage.getItem(VOLUME_KEY) ?? '');
+  const stored = Number.parseFloat(
+    window.localStorage.getItem(VOLUME_KEY) ?? '',
+  );
   if (!Number.isFinite(stored)) return DEFAULT_VOLUME;
   return Math.min(1, Math.max(0, stored));
 }
@@ -50,6 +52,7 @@ export function useRadioPlayer(pollInterval = DEFAULT_POLL_INTERVAL) {
   useEffect(() => {
     const audio = new Audio();
     audio.preload = 'none';
+    audio.setAttribute('playsinline', '');
     audio.volume = volumeRef.current;
     audio.muted = mutedRef.current;
     audio.src = RADIO_AUDIO_SOURCES[0];
@@ -90,12 +93,23 @@ export function useRadioPlayer(pollInterval = DEFAULT_POLL_INTERVAL) {
     audio.addEventListener('stalled', handleBuffering);
     audio.addEventListener('error', handleError);
 
+    if ('mediaSession' in navigator) {
+      navigator.mediaSession.setActionHandler('play', () => {
+        void audio.play().catch(() => undefined);
+      });
+      navigator.mediaSession.setActionHandler('pause', () => audio.pause());
+    }
+
     return () => {
       audio.removeEventListener('playing', handlePlaying);
       audio.removeEventListener('pause', handlePause);
       audio.removeEventListener('waiting', handleBuffering);
       audio.removeEventListener('stalled', handleBuffering);
       audio.removeEventListener('error', handleError);
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.setActionHandler('play', null);
+        navigator.mediaSession.setActionHandler('pause', null);
+      }
       audio.pause();
       audio.removeAttribute('src');
       audio.load();
