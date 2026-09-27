@@ -5,6 +5,7 @@ import { authRoutes } from './interface/routes/auth.routes.js';
 import { songRoutes } from './interface/routes/song.routes.js';
 import { prayerRoutes } from './interface/routes/prayer.routes.js';
 import { boardRoutes } from './interface/routes/board.routes.js';
+import { radioRoutes } from './interface/routes/radio.routes.js';
 import { IUserRepository } from './domain/repositories/IUserRepository.js';
 import { ISongRequestRepository } from './domain/repositories/ISongRequestRepository.js';
 import { IPrayerRequestRepository } from './domain/repositories/IPrayerRequestRepository.js';
@@ -15,6 +16,8 @@ import { PrismaPrayerRequestRepository } from './infrastructure/repositories/Pri
 import { PrismaBoardMessageRepository } from './infrastructure/repositories/PrismaBoardMessageRepository.js';
 
 import { IGoogleAuthProvider } from './domain/providers/IGoogleAuthProvider.js';
+import { IShoutcastStreamProvider } from './domain/providers/IShoutcastStreamProvider.js';
+import { ShoutcastStreamProvider } from './infrastructure/providers/ShoutcastStreamProvider.js';
 
 export interface AppDependencies {
   userRepository?: IUserRepository;
@@ -22,6 +25,7 @@ export interface AppDependencies {
   prayerRepository?: IPrayerRequestRepository;
   boardRepository?: IBoardMessageRepository;
   googleAuthProvider?: IGoogleAuthProvider;
+  radioStreamProvider?: IShoutcastStreamProvider;
   logger?: boolean;
 }
 
@@ -66,6 +70,11 @@ export function buildApp(dependencies?: AppDependencies): FastifyInstance {
   app.register(songRoutes(songRepo));
   app.register(prayerRoutes(prayerRepo));
   app.register(boardRoutes(boardRepo));
+  app.register(
+    radioRoutes(
+      dependencies?.radioStreamProvider ?? new ShoutcastStreamProvider(),
+    ),
+  );
 
   return app;
 }
