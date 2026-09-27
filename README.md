@@ -102,14 +102,6 @@ git checkout main
 git merge feat/minha-feature
 ```
 
-## Backend (deploy separado)
-
-O backend Fastify não roda na Vercel como app Node tradicional. Opções recomendadas:
-
-- [Railway](https://railway.app)
-- [Render](https://render.com)
-- [Fly.io](https://fly.io)
-
 Comandos de build/start:
 
 ```bash
